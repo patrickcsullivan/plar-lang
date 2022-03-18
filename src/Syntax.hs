@@ -49,3 +49,30 @@ prettyPrintPrefix opPrc opStr prc frm =
    in if prc > opPrc
         then "(" ++ s ++ ")"
         else s
+
+instance Functor Formula where
+  fmap f frm =
+    case frm of
+      F -> F
+      T -> T
+      Atom a -> Atom $ f a
+      Not frm -> Not (f <$> frm)
+      And frm frm' -> And (f <$> frm) (f <$> frm')
+      Or frm frm' -> Or (f <$> frm) (f <$> frm')
+      Imp frm frm' -> Imp (f <$> frm) (f <$> frm')
+      Iff frm frm' -> Iff (f <$> frm) (f <$> frm')
+      ForAll s frm -> ForAll s (f <$> frm)
+      Exists s frm -> Exists s (f <$> frm)
+
+instance Foldable Formula where
+  foldr f z frm =
+    case frm of
+      Atom a -> f a z
+      Not frm -> foldr f z frm
+      And frm frm' -> foldr f (foldr f z frm') frm
+      Or frm frm' -> foldr f (foldr f z frm') frm
+      Imp frm frm' -> foldr f (foldr f z frm') frm
+      Iff frm frm' -> foldr f (foldr f z frm') frm
+      ForAll _ frm -> foldr f z frm
+      Exists _ frm -> foldr f z frm
+      _ -> z
