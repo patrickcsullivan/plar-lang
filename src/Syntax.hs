@@ -1,5 +1,10 @@
 module Syntax where
 
+newtype Prop = Prop String
+
+instance Show Prop where
+  show (Prop name) = name
+
 data Formula a
   = F
   | T

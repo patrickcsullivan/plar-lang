@@ -22,30 +22,30 @@ table =
     [Ex.Infix (reservedOp "<=>" >> return Iff) Ex.AssocRight]
   ]
 
-parseFormula :: String -> Either ParseError (Formula String)
-parseFormula = parse (Tok.whiteSpace lexer *> formula <* Tok.whiteSpace lexer) "<parser>"
+parseFormula :: String -> Either ParseError (Formula Prop)
+parseFormula = parse (Tok.whiteSpace lexer *> formula (Prop <$> identifier) <* Tok.whiteSpace lexer) "<parser>"
 
-formula :: Parser (Formula String)
-formula = Ex.buildExpressionParser table formulaTerm
+formula :: Parser a -> Parser (Formula a)
+formula atomIdentifier = Ex.buildExpressionParser table (formulaTerm atomIdentifier)
 
-formulaTerm :: Parser (Formula String)
-formulaTerm =
+formulaTerm :: Parser a -> Parser (Formula a)
+formulaTerm atomIdentifier =
   try formulaTrue
     <|> try formulaFalse
-    <|> formulaAtom
-    <|> parens formula
+    <|> formulaAtom atomIdentifier
+    <|> parens (formula atomIdentifier)
 
-formulaAtom :: Parser (Formula String)
-formulaAtom = do
-  atom <- identifier
-  return $ Atom atom
+formulaAtom :: Parser a -> Parser (Formula a)
+formulaAtom atomIdentifier = do
+  a <- atomIdentifier
+  return $ Atom a
 
-formulaTrue :: Parser (Formula String)
+formulaTrue :: Parser (Formula a)
 formulaTrue = do
   reserved "True"
   return T
 
-formulaFalse :: Parser (Formula String)
+formulaFalse :: Parser (Formula a)
 formulaFalse = do
   reserved "False"
   return F
