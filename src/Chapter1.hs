@@ -8,7 +8,6 @@ module Chapter1
   )
 where
 
-import Lex (isNumeric, lex)
 import Prelude hiding (lex)
 
 someFunc :: IO ()
@@ -54,6 +53,36 @@ testStr = "(x1 + x2 + x3) * (1 + 2 + 3 * x + y)"
 type Token = String
 
 type TokenParser = [Token] -> Either Error (Expression, [Token])
+
+isSpace :: Char -> Bool
+isSpace c = c `elem` " \t\n\r"
+
+isPunctuation :: Char -> Bool
+isPunctuation c = c `elem` "()[]{}"
+
+isSymbol :: Char -> Bool
+isSymbol c = c `elem` "~'!@#$%^&*-+=|\\:;<>.?/"
+
+isNumeric :: Char -> Bool
+isNumeric c = c `elem` "0123456789"
+
+isAlphanumeric :: Char -> Bool
+isAlphanumeric c = c `elem` "abcdefghijklmnopqrstuvwxyz_'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+lexWhile :: (Char -> Bool) -> String -> (Token, String)
+lexWhile = span
+
+lex :: String -> [Token]
+lex input =
+  case snd $ lexWhile isSpace input of
+    "" -> []
+    c : cs ->
+      let prop
+            | isAlphanumeric c = isAlphanumeric
+            | isSymbol c = isSymbol
+            | otherwise = const False
+       in let (toktl, rest) = lexWhile prop cs
+           in (c : toktl) : lex rest
 
 parseExpression :: TokenParser
 parseExpression toks = do

@@ -26,8 +26,9 @@ source-repository head
 library
   exposed-modules:
       Chapter1
-      Chapter2
-      Lex
+      Lexer
+      Parser
+      Syntax
   other-modules:
       Paths_logic_lang
   hs-source-dirs:
