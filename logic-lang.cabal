@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Chapter1
+      Chapter2
       Lexer
       Parser
       Syntax

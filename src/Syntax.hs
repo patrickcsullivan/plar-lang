@@ -1,6 +1,6 @@
 module Syntax where
 
-newtype Prop = Prop String
+newtype Prop = Prop String deriving (Eq, Ord)
 
 instance Show Prop where
   show (Prop name) = name

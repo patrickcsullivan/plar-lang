@@ -4,6 +4,7 @@
 
 module Parser
   ( parseFormula,
+    parseFormula',
   )
 where
 
@@ -24,6 +25,12 @@ table =
 
 parseFormula :: String -> Either ParseError (Formula Prop)
 parseFormula = parse (Tok.whiteSpace lexer *> formula (Prop <$> identifier) <* Tok.whiteSpace lexer) "<parser>"
+
+parseFormula' :: String -> Formula Prop
+parseFormula' s =
+  case parseFormula s of
+    Right frm -> frm
+    Left _ -> undefined
 
 formula :: Parser a -> Parser (Formula a)
 formula atomIdentifier = Ex.buildExpressionParser table (formulaTerm atomIdentifier)
