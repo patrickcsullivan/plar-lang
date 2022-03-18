@@ -26,12 +26,15 @@ source-repository head
 library
   exposed-modules:
       Chapter1
+      Chapter2
+      Lex
   other-modules:
       Paths_logic_lang
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , parsec
   default-language: Haskell2010
 
 executable logic-lang-exe
@@ -44,6 +47,7 @@ executable logic-lang-exe
   build-depends:
       base >=4.7 && <5
     , logic-lang
+    , parsec
   default-language: Haskell2010
 
 test-suite logic-lang-test
@@ -57,4 +61,5 @@ test-suite logic-lang-test
   build-depends:
       base >=4.7 && <5
     , logic-lang
+    , parsec
   default-language: Haskell2010
