@@ -16,8 +16,8 @@ import qualified Text.Parsec.Token as Tok
 
 table =
   [ [Ex.Prefix (reservedOp "~" >> return Not)],
-    [Ex.Infix (reservedOp "&&" >> return And) Ex.AssocRight],
-    [Ex.Infix (reservedOp "||" >> return Or) Ex.AssocRight],
+    [Ex.Infix (reservedOp "and" >> return And) Ex.AssocRight],
+    [Ex.Infix (reservedOp "or" >> return Or) Ex.AssocRight],
     [Ex.Infix (reservedOp "==>" >> return Imp) Ex.AssocRight],
     [Ex.Infix (reservedOp "<=>" >> return Iff) Ex.AssocRight]
   ]
