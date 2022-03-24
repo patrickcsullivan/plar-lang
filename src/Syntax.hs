@@ -50,6 +50,20 @@ prettyPrintPrefix opPrc opStr prc frm =
         then "(" ++ s ++ ")"
         else s
 
+onAtoms :: (a -> Formula b) -> Formula a -> Formula b
+onAtoms f frm =
+  case frm of
+    F -> F
+    T -> T
+    Atom a -> f a
+    Not frm -> Not (onAtoms f frm)
+    And frm frm' -> And (onAtoms f frm) (onAtoms f frm')
+    Or frm frm' -> Or (onAtoms f frm) (onAtoms f frm')
+    Imp frm frm' -> Imp (onAtoms f frm) (onAtoms f frm')
+    Iff frm frm' -> Iff (onAtoms f frm) (onAtoms f frm')
+    ForAll s frm -> ForAll s (onAtoms f frm)
+    Exists s frm -> Exists s (onAtoms f frm)
+
 instance Functor Formula where
   fmap f frm =
     case frm of
