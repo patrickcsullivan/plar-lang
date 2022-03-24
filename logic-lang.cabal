@@ -25,10 +25,16 @@ source-repository head
 
 library
   exposed-modules:
-      Chapter1
-      Chapter2
       Lexer
       Parser
+      Propositional.Cnf
+      Propositional.Evaluate
+      Propositional.Formula
+      Propositional.Nnf
+      Propositional.PrettyPrint
+      Propositional.Satisfiability
+      Propositional.TruthTable
+      Propositional.Valuation
       Syntax
   other-modules:
       Paths_logic_lang
