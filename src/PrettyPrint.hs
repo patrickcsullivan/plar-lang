@@ -1,11 +1,11 @@
-module Propositional.PrettyPrint (prettyPrint) where
+module PrettyPrint (prettyPrint) where
 
 import Syntax (Formula (..))
 
 type Precidence = Int
 
-instance Show a => Show (Formula a) where
-  show = prettyPrint 0
+-- instance Show a => Show (Formula a) where
+--   show = prettyPrint 0
 
 prettyPrint :: Show a => Precidence -> Formula a -> String
 prettyPrint prc formula = case formula of

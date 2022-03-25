@@ -1,4 +1,4 @@
-module Lexer where
+module Propositional.Lexer where
 
 import Text.Parsec.Language (emptyDef)
 import Text.Parsec.String (Parser)
@@ -7,7 +7,7 @@ import qualified Text.Parsec.Token as Tok
 lexer :: Tok.TokenParser ()
 lexer = Tok.makeTokenParser style
   where
-    ops = ["~", "and", "or", "==>", "<=>"]
+    ops = ["~", "and", "or", "==>", "<=>", "+", "-", "*", "/", "^"]
     names = ["True", "False"]
     style =
       emptyDef
