@@ -88,7 +88,7 @@ formulaFalse = do
 formulaForAll :: Parser a -> Parser (Formula a)
 formulaForAll atomInner = do
   reserved "forall"
-  (v : vs) <- many1 identifier
+  (v : vs) <- reverse <$> many1 identifier
   char '.'
   spaces
   scope <- formula atomInner
@@ -97,7 +97,7 @@ formulaForAll atomInner = do
 formulaExists :: Parser a -> Parser (Formula a)
 formulaExists atomInner = do
   reserved "exists"
-  (v : vs) <- many1 identifier
+  (v : vs) <- reverse <$> many1 identifier
   char '.'
   spaces
   scope <- formula atomInner

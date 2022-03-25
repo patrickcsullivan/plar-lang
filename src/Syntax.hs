@@ -27,7 +27,8 @@ data Formula a
 -- is built up from non-propositional variables and constants using functions
 -- and predicates.
 --
--- A relation/predicate with zero arguments correponds to a simple propositional
+-- A function that maps the "object" domain to Boolean values. A
+-- relation/predicate with zero arguments correponds to a simple propositional
 -- variable.
 data Rltn = Rltn String [Term] deriving (Eq, Ord, Show)
 
