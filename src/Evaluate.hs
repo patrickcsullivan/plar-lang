@@ -18,6 +18,8 @@ newtype Valuation a = Valuation
   { unValuation :: Map String a
   }
 
+-- | Returns a function that substitutes the domain "object" `a` in for the
+-- variable name `x` in the valuation.
 (|->) :: String -> a -> (Valuation a -> Valuation a)
 x |-> a = Valuation . Map.adjust (const a) x . unValuation
 
@@ -54,3 +56,6 @@ holds m val fm =
     Iff p q -> holds m val p == holds m val q
     ForAll x p -> all (\a -> holds m ((x |-> a) val) p) (domain m)
     Exists x p -> any (\a -> holds m ((x |-> a) val) p) (domain m)
+
+boolInterp :: Interpretation Bool
+boolInterp = Interpretation {domain = [False, True], fns = Map.empty, preds = Map.empty}
