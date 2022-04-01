@@ -26,7 +26,10 @@ source-repository head
 library
   exposed-modules:
       Evaluate
-      Parser
+      Parser.Formula
+      Parser.Parser
+      Parser.Rltn
+      Parser.Term
       PrettyPrint
       Propositional.Cnf
       Propositional.Evaluate
@@ -73,6 +76,7 @@ test-suite logic-lang-test
   build-depends:
       base >=4.7 && <5
     , containers
+    , hspec
     , logic-lang
     , parsec
   default-language: Haskell2010
