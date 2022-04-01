@@ -32,10 +32,10 @@ freeVars frm = case frm of
   F -> Set.empty
   T -> Set.empty
   Atom (Rltn _ args) -> Set.unions (termVars <$> args)
-  Not p -> vars p
-  And p q -> vars p `Set.union` vars q
-  Or p q -> vars p `Set.union` vars q
-  Imp p q -> vars p `Set.union` vars q
-  Iff p q -> vars p `Set.union` vars q
-  ForAll x p -> Set.delete x (vars p)
-  Exists x p -> Set.delete x (vars p)
+  Not p -> freeVars p
+  And p q -> freeVars p `Set.union` freeVars q
+  Or p q -> freeVars p `Set.union` freeVars q
+  Imp p q -> freeVars p `Set.union` freeVars q
+  Iff p q -> freeVars p `Set.union` freeVars q
+  ForAll x p -> Set.delete x (freeVars p)
+  Exists x p -> Set.delete x (freeVars p)
