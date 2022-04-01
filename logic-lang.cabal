@@ -42,6 +42,7 @@ library
       Propositional.TruthTable
       Propositional.Valuation
       Syntax
+      SyntaxOp
   other-modules:
       Paths_logic_lang
   hs-source-dirs:
