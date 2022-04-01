@@ -1,11 +1,14 @@
 import Control.Exception (evaluate)
+import Evaluate (holds)
+import EvaluateExample (boolInterp, boolValuation, modInterp, modValuation)
 import qualified Parser.Parser as Parser
 import Syntax (Formula (..), Rltn (..), Term (..))
-import Test.Hspec (describe, hspec, it, shouldBe)
+import Test.Hspec (context, describe, hspec, it, pending, shouldBe)
 
 main :: IO ()
 main = hspec $ do
   parserSpec
+  holdsSpec
 
 parserSpec =
   describe "Parser.Parser.run" $ do
@@ -53,15 +56,16 @@ parserSpec =
               )
           )
 
--- it "parses an infix symbol predicate" $ do
---   Parser.run "x < y" `shouldBeRight` Atom (Rltn "<" [Var "x", Var "y"])
--- it "parses an infix non-symbol predicate" $ do
---   Parser.run "x `and` y" `shouldBeRight` Atom (Rltn "and" [Var "x", Var "y"])
-
--- it "parses an infix symbol function" $ do
---   Parser.run "f(x >>= y)" `shouldBeRight` Atom (Rltn "f" [Fn ">>=" [Var "x", Var "y"]])
--- it "parses an infix non-symbol predicate" $ do
---   Parser.run "f(x `g` y)" `shouldBeRight` Atom (Rltn "f" [Fn "g" [Var "x", Var "y"]])
+holdsSpec =
+  describe "Evaluate.holds" $ do
+    context "for formula \"forall x. (x = 0) or (x = 1)\"" $ do
+      let frm = Parser.run' "forall x. (x = 0) or (x = 1)"
+      it "holds in Boolean interpretation and valuation" $ do
+        holds boolInterp boolValuation frm `shouldBe` True
+      it "holds in mod 2 interpretation and valuation" $ do
+        holds (modInterp 2) (modValuation 2) frm `shouldBe` True
+      it "does not hold in mod 3 interpretation and valuation" $ do
+        holds (modInterp 3) (modValuation 3) frm `shouldBe` False
 
 x `shouldBeRight` y = x `shouldBe` Right y
 

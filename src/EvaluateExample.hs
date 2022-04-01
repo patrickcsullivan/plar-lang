@@ -1,4 +1,4 @@
-module ExampleEvaluate where
+module EvaluateExample where
 
 import Data.Map.Strict (Map, (!))
 import qualified Data.Map.Strict as Map
