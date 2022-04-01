@@ -50,10 +50,10 @@ lexer = Tok.makeTokenParser style
     style =
       emptyDef
         { -- Prefix domain functions can contain alphanumeric and _ characters.
-          Tok.identStart = letter <|> char '_',
+          Tok.identStart = alphaNum <|> char '_',
           Tok.identLetter = alphaNum <|> char '_',
-          -- Infix domain functions can contain a mix of symbols and
-          -- alphanumeric characters.
+          -- We are required to define operator characters, but the only allowed
+          -- infix operators are the reserved ones.
           Tok.opStart = symbols,
           Tok.opLetter = symbols <|> alphaNum <|> char '_',
           -- Arithmetic operators are reserved so each can be given the correct

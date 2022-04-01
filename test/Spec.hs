@@ -27,7 +27,7 @@ parserSpec =
     it "parses a reserved infix function" $ do
       Parser.run "f(x + y)" `shouldBeRight` Atom (Rltn "f" [Fn "+" [Var "x", Var "y"]])
     -- Complicated formulas
-    it "parses \"forall x y. exists z. x < z + z and f(y) < z\"" $ do
+    it "parses complicated" $ do
       Parser.run "forall x y. exists z. x < z + z and f(y) < z"
         `shouldBeRight` ForAll
           "x"
@@ -36,23 +36,20 @@ parserSpec =
               ( Exists
                   "z"
                   ( And
-                      ( Atom
-                          ( Rltn
-                              "<"
-                              [ Var "x",
-                                Fn "+" [Var "z", Var "z"]
-                              ]
-                          )
-                      )
-                      ( Atom
-                          ( Rltn
-                              "<"
-                              [ Fn "f" [Var "y"],
-                                Var "z"
-                              ]
-                          )
-                      )
+                      (Atom (Rltn "<" [Var "x", Fn "+" [Var "z", Var "z"]]))
+                      (Atom (Rltn "<" [Fn "f" [Var "y"], Var "z"]))
                   )
+              )
+          )
+    it "parses complicated" $ do
+      Parser.run "exists x. (x = 0) or exists y. (y = 1)"
+        `shouldBeRight` Exists
+          "x"
+          ( Or
+              (Atom (Rltn "=" [Var "x", Var "0"]))
+              ( Exists
+                  "y"
+                  (Atom (Rltn "=" [Var "y", Var "1"]))
               )
           )
 

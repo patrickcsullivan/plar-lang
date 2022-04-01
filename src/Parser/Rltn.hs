@@ -38,12 +38,15 @@ lexer = Tok.makeTokenParser style
         { -- Prefix relations can contain alphanumeric and _ characters.
           Tok.identStart = letter <|> char '_',
           Tok.identLetter = alphaNum <|> char '_',
+          -- Prevent the relation parser from trying to parse formula keywords
+          -- as relations.
+          Tok.reservedNames = ["True", "False", "forall", "exists"],
           -- Some reserved operators can be used as infix relations.
           Tok.reservedOpNames = reservedOpNames
         }
 
 reservedOpNames :: [String]
-reservedOpNames = ["<", ">", "<=", ">=", "/=", "=="]
+reservedOpNames = ["<", ">", "<=", ">=", "/=", "="]
 
 reservedOp :: Parser String
 reservedOp = do
