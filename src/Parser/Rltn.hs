@@ -3,7 +3,7 @@ module Parser.Rltn (rltn) where
 import Data.Maybe (fromMaybe)
 import Parser.Term (term)
 import Syntax (Formula (..), Rltn (..), Term (..))
-import Text.Parsec (alphaNum, char, letter, many1, oneOf, optionMaybe, parserZero, try, (<|>))
+import Text.Parsec (alphaNum, char, choice, letter, many1, optionMaybe, parserZero, string, try, (<?>), (<|>))
 import qualified Text.Parsec.Expr as Ex
 import Text.Parsec.Language (emptyDef)
 import Text.Parsec.String (Parser)
@@ -15,6 +15,7 @@ rltn :: Parser Rltn
 rltn =
   try infixRltn
     <|> prefixRltn
+    <?> "relation"
 
 prefixRltn :: Parser Rltn
 prefixRltn = do
@@ -25,8 +26,7 @@ prefixRltn = do
 infixRltn :: Parser Rltn
 infixRltn = do
   left <- term
-  name <- (char '`' *> identifier <* char '`') <|> operator
-  whiteSpace
+  name <- reservedOp
   right <- term
   return $ Rltn name [left, right]
 
@@ -38,14 +38,18 @@ lexer = Tok.makeTokenParser style
         { -- Prefix relations can contain alphanumeric and _ characters.
           Tok.identStart = letter <|> char '_',
           Tok.identLetter = alphaNum <|> char '_',
-          -- Infix relations can contain a mix of symbols and alphanumeric.
-          Tok.opStart = symbols,
-          Tok.opLetter = symbols <|> alphaNum <|> char '_',
-          -- There are no reserved names.
-          Tok.reservedOpNames = [],
-          Tok.reservedNames = []
+          -- Some reserved operators can be used as infix relations.
+          Tok.reservedOpNames = reservedOpNames
         }
-    symbols = oneOf ":!#$%&*+./<=>?@\\^|-~"
+
+reservedOpNames :: [String]
+reservedOpNames = ["<", ">", "<=", ">=", "/=", "=="]
+
+reservedOp :: Parser String
+reservedOp = do
+  op <- choice $ string <$> reservedOpNames
+  whiteSpace
+  return op
 
 whiteSpace :: Parser ()
 whiteSpace = Tok.whiteSpace lexer
@@ -58,6 +62,3 @@ commaSep = Tok.commaSep lexer
 
 identifier :: Parser String
 identifier = Tok.identifier lexer
-
-operator :: Parser String
-operator = Tok.operator lexer

@@ -1,8 +1,9 @@
 module Parser.Term (term) where
 
+import Data.Functor ((<&>))
 import Data.Maybe (fromMaybe)
 import Syntax (Formula (..), Rltn (..), Term (..))
-import Text.Parsec (ParseError, alphaNum, char, letter, many, many1, oneOf, optionMaybe, optional, parse, spaces, try, (<|>))
+import Text.Parsec (ParseError, alphaNum, char, letter, many, many1, oneOf, optionMaybe, optional, parse, spaces, try, (<?>), (<|>))
 import qualified Text.Parsec.Expr as Ex
 import Text.Parsec.Language (emptyDef)
 import Text.Parsec.String (Parser)
@@ -20,7 +21,8 @@ termTable =
     [ Ex.Infix (reservedOp "+" >> return (mkBinary "+")) Ex.AssocLeft,
       Ex.Infix (reservedOp "-" >> return (mkBinary "-")) Ex.AssocLeft
     ],
-    [Ex.Infix (reservedOp ":" >> return (mkBinary ":")) Ex.AssocRight]
+    [ Ex.Infix (reservedOp ":" >> return (mkBinary ":")) Ex.AssocRight
+    ]
   ]
 
 mkBinary :: String -> Term -> Term -> Term
@@ -31,26 +33,13 @@ termCase =
   try fn
     <|> var
     <|> parens term
+    <?> "term"
 
 fn :: Parser Term
 fn = do
   name <- identifier
   args <- parens $ commaSep term
   return $ Fn name args
-
--- prefixFn :: Parser Term
--- prefixFn = do
---   name <- identifier
---   args <- parens $ commaSep term
---   return $ Fn name args
-
--- infixFn :: Parser Term
--- infixFn = do
---   left <- term
---   name <- (char '`' *> identifier <* char '`') <|> operator
---   whiteSpace
---   right <- term
---   return $ Fn name [left, right]
 
 var :: Parser Term
 var = Var <$> identifier
@@ -67,9 +56,9 @@ lexer = Tok.makeTokenParser style
           -- alphanumeric characters.
           Tok.opStart = symbols,
           Tok.opLetter = symbols <|> alphaNum <|> char '_',
-          -- Arithmetic and cons operators are reserved so each can be given
-          -- the correct precedence and associativity.
-          Tok.reservedOpNames = [":", "+", "-", "*", "/", "^"],
+          -- Arithmetic operators are reserved so each can be given the correct
+          -- precedence and associativity.
+          Tok.reservedOpNames = ["+", "-", "*", "/", "^"],
           -- There are no reserved prefix domain function or domain variables
           -- names.
           Tok.reservedNames = []
