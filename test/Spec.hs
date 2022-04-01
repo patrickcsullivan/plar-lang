@@ -28,7 +28,7 @@ parserSpec =
       Parser.run "f(x + y)" `shouldBeRight` Atom (Rltn "f" [Fn "+" [Var "x", Var "y"]])
     -- Complicated formulas
     it "parses \"forall x y. exists z. x < z + z and f(y) < z\"" $ do
-      Parser.run "forall x y. exists z. x < z and y < z"
+      Parser.run "forall x y. exists z. x < z + z and f(y) < z"
         `shouldBeRight` ForAll
           "x"
           ( ForAll
