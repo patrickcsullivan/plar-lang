@@ -1,6 +1,8 @@
 -- | Operators on the abstract syntax tree.
-module SyntaxOp where
+module SyntaxOp (termSubst, termVars) where
 
+import Data.Map (Map)
+import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Syntax (Formula (..), Rltn (..), Term (..))
@@ -39,3 +41,16 @@ freeVars frm = case frm of
   Iff p q -> freeVars p `Set.union` freeVars q
   ForAll x p -> Set.delete x (freeVars p)
   Exists x p -> Set.delete x (freeVars p)
+
+-- | A variable assignment that maps variables to terms.
+type Instantiation = Map String Term
+
+-- | Substitute terms from the instantiation for variables in the given term. If
+-- a variable in the given term is not in the instantiation then it is left
+-- unchanged.
+termSubst :: Instantiation -> Term -> Term
+termSubst inst trm = case trm of
+  Var name -> case Map.lookup name inst of
+    Nothing -> Var name -- The variable has no substitute, so leave it alone.
+    Just subst -> subst
+  Fn name args -> Fn name (termSubst inst <$> args)

@@ -1,14 +1,18 @@
 import Control.Exception (evaluate)
+import qualified Data.Map as Map
+import qualified Data.Set as Set
 import Evaluate (holds)
 import EvaluateExample (boolInterp, boolValuation, modInterp, modValuation)
 import qualified Parser.Parser as Parser
 import Syntax (Formula (..), Rltn (..), Term (..))
+import SyntaxOp (termSubst, termVars)
 import Test.Hspec (context, describe, hspec, it, pending, shouldBe)
 
 main :: IO ()
 main = hspec $ do
   parserSpec
   holdsSpec
+  termSubstSpec
 
 parserSpec =
   describe "Parser.Parser.run" $ do
@@ -58,7 +62,7 @@ parserSpec =
 
 holdsSpec =
   describe "Evaluate.holds" $ do
-    context "for formula \"forall x. (x = 0) or (x = 1)\"" $ do
+    context "formula: forall x. (x = 0) or (x = 1)" $ do
       let frm = Parser.run' "forall x. (x = 0) or (x = 1)"
       it "holds in Boolean interpretation and valuation" $ do
         holds boolInterp boolValuation frm `shouldBe` True
@@ -66,6 +70,19 @@ holdsSpec =
         holds (modInterp 2) (modValuation 2) frm `shouldBe` True
       it "does not hold in mod 3 interpretation and valuation" $ do
         holds (modInterp 3) (modValuation 3) frm `shouldBe` False
+
+termSubstSpec =
+  describe "SyntaxOp.termSubst" $ do
+    context "term f(x, y)" $ do
+      let fTrm = Fn "f" [Var "x", Var "y"]
+      context "instantiation: x |-> g(a, b), y |-> h(c, d)" $ do
+        let gTrm = Fn "g" [Var "a", Var "b"]
+        let hTrm = Fn "h" [Var "c", Var "d"]
+        let inst = Map.fromList [("x", gTrm), ("y", hTrm)]
+        it "substitues terms" $ do
+          termSubst inst fTrm `shouldBe` Fn "f" [gTrm, hTrm]
+        it "free vars in the substituted term are precisely those free in the terms that are substituted in" $ do
+          termVars (termSubst inst fTrm) `shouldBe` (termVars gTrm `Set.union` termVars hTrm)
 
 x `shouldBeRight` y = x `shouldBe` Right y
 
