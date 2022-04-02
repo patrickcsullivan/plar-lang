@@ -5,7 +5,7 @@ import Evaluate (holds)
 import EvaluateExample (boolInterp, boolValuation, modInterp, modValuation)
 import qualified Parser.Parser as Parser
 import Syntax (Formula (..), Rltn (..), Term (..))
-import SyntaxOp (termSubst, termVars)
+import SyntaxOp (subst, termSubst, termVars, (|=>))
 import Test.Hspec (context, describe, hspec, it, pending, shouldBe)
 
 main :: IO ()
@@ -13,13 +13,23 @@ main = hspec $ do
   parserSpec
   holdsSpec
   termSubstSpec
+  substSpec
 
 parserSpec =
   describe "Parser.Parser.run" $ do
     -- Formula connectives
     it "parses `and` connective" $ do
       Parser.run "x and y" `shouldBeRight` And (Atom (Rltn "x" [])) (Atom (Rltn "y" []))
+    -- Quantified formulas
+    it "parses forall x" $ do
+      Parser.run "forall x. x = y" `shouldBeRight` ForAll "x" (Atom (Rltn "=" [Var "x", Var "y"]))
+    it "parses exists x" $ do
+      Parser.run "exists x. x = y" `shouldBeRight` Exists "x" (Atom (Rltn "=" [Var "x", Var "y"]))
     -- Predicates / relations
+    it "parses names with prime symbol" $ do
+      Parser.run "c'" `shouldBeRight` Atom (Rltn "c'" [])
+      Parser.run "c'()" `shouldBeRight` Atom (Rltn "c'" [])
+      Parser.run "f'(x)" `shouldBeRight` Atom (Rltn "f'" [Var "x"])
     it "parses a nullary predicate without paraentheses" $ do
       Parser.run "c" `shouldBeRight` Atom (Rltn "c" [])
     it "parses a nullary predicate with paraentheses" $ do
@@ -73,7 +83,7 @@ holdsSpec =
 
 termSubstSpec =
   describe "SyntaxOp.termSubst" $ do
-    context "term f(x, y)" $ do
+    context "term: f(x, y)" $ do
       let fTrm = Fn "f" [Var "x", Var "y"]
       context "instantiation: x |-> g(a, b), y |-> h(c, d)" $ do
         let gTrm = Fn "g" [Var "a", Var "b"]
@@ -83,6 +93,21 @@ termSubstSpec =
           termSubst inst fTrm `shouldBe` Fn "f" [gTrm, hTrm]
         it "free vars in the substituted term are precisely those free in the terms that are substituted in" $ do
           termVars (termSubst inst fTrm) `shouldBe` (termVars gTrm `Set.union` termVars hTrm)
+
+substSpec =
+  describe "SyntaxOp.subst" $ do
+    context "formula: forall x. x = y" $ do
+      let frm = Parser.run' "forall x. x = y"
+      context "instantiation: y |-> x" $ do
+        let inst = "y" |=> Var "x"
+        it "renames x to x'" $ do
+          subst inst frm `shouldBe` Parser.run' "forall x'. x' = x"
+    context "formula: forall x x'. x = y ==> x = x'" $ do
+      let frm = Parser.run' "forall x x'. x = y ==> x = x'"
+      context "instantiation: y |-> x" $ do
+        let inst = "y" |=> Var "x"
+        it "renames x to x' and x' to x''" $ do
+          subst inst frm `shouldBe` Parser.run' "forall x' x''. x' = x ==> x' = x''"
 
 x `shouldBeRight` y = x `shouldBe` Right y
 

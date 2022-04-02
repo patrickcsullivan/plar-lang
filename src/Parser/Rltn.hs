@@ -37,7 +37,7 @@ lexer = Tok.makeTokenParser style
       emptyDef
         { -- Prefix relations can contain alphanumeric and _ characters.
           Tok.identStart = letter <|> char '_',
-          Tok.identLetter = alphaNum <|> char '_',
+          Tok.identLetter = alphaNum <|> char '_' <|> char '\'',
           -- Prevent the relation parser from trying to parse formula keywords
           -- as relations.
           Tok.reservedNames = ["True", "False", "forall", "exists"],
