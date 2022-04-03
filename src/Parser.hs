@@ -1,19 +1,19 @@
 module Parser
-  ( run,
-    run',
+  ( parse,
+    parse',
   )
 where
 
 import Parser.Formula (formula)
 import Parser.Rltn (rltn)
 import Syntax (Formula, Rltn)
-import Text.Parsec (ParseError, parse)
+import qualified Text.Parsec as Parsec
 
-run :: String -> Either ParseError (Formula Rltn)
-run = parse (formula rltn) "<parser>"
+parse :: String -> Either Parsec.ParseError (Formula Rltn)
+parse = Parsec.parse (formula rltn) "<parser>"
 
-run' :: String -> Formula Rltn
-run' s =
-  case run s of
+parse' :: String -> Formula Rltn
+parse' s =
+  case parse s of
     Right frm -> frm
     Left _ -> undefined

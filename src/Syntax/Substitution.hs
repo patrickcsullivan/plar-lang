@@ -9,7 +9,7 @@ import qualified Data.Set as Set
 import Syntax (Formula (..), Rltn (..), Term (..))
 import Syntax.Instantiation (Instantiation, (|->))
 import qualified Syntax.Instantiation as I
-import Syntax.Vars (freeVars, termVars)
+import Syntax.Vars (freeVars, termVars, variant)
 
 -- | Substitutes terms from the instantiation for free variables in the given
 -- formula. If a variable in the given formula is not in the instantiation then
@@ -46,7 +46,7 @@ termSubst inst trm =
 substQ ::
   -- | The instantion containing substitions.
   Instantiation ->
-  -- | A function for recreating the quantified formula into which terms are
+  -- | Function for recreating the quantified formula into which terms are
   -- substituted.
   (String -> Formula Rltn -> Formula Rltn) ->
   -- | The variable binding of the quantified formula into which terms are
@@ -75,12 +75,3 @@ substQ inst mkQuant x p =
       inst' = (x |-> Var x') inst
       p' = subst ((x |-> Var x') inst) p
    in mkQuant x' p'
-
--- | Returns a variant of the given variable name that is distinct from the list
--- of variable names. Returns the variable name unchanged if it is not in the
--- list of variable names.
-variant :: String -> Set String -> String
-variant x vars =
-  if x `elem` vars
-    then variant (x ++ "'") vars
-    else x

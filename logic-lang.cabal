@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      AndOr
       Evaluate
       Evaluate.Example
       Evaluate.Interpretation
