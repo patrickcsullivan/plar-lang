@@ -41,6 +41,7 @@ library
       Propositional.Satisfiability
       Propositional.TruthTable
       Propositional.Valuation
+      Rewrite
       Syntax
       SyntaxOp
   other-modules:
