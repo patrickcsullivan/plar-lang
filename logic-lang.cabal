@@ -26,24 +26,19 @@ source-repository head
 library
   exposed-modules:
       Evaluate
-      EvaluateExample
+      Evaluate.Example
+      Evaluate.Interpretation
+      Evaluate.Valuation
+      Parser
       Parser.Formula
-      Parser.Parser
       Parser.Rltn
       Parser.Term
       PrettyPrint
-      Propositional.Cnf
-      Propositional.Evaluate
-      Propositional.Formula
-      Propositional.Lexer
-      Propositional.Nnf
-      Propositional.Parser
-      Propositional.Satisfiability
-      Propositional.TruthTable
-      Propositional.Valuation
       Rewrite
       Syntax
-      SyntaxOp
+      Syntax.Instantiation
+      Syntax.Substitution
+      Syntax.Vars
   other-modules:
       Paths_logic_lang
   hs-source-dirs:

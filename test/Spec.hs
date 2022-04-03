@@ -2,10 +2,12 @@ import Control.Exception (evaluate)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Evaluate (holds)
-import EvaluateExample (boolInterp, boolValuation, modInterp, modValuation)
-import qualified Parser.Parser as Parser
+import Evaluate.Example (boolInterp, boolValuation, modInterp, modValuation)
+import Parser
 import Syntax (Formula (..), Rltn (..), Term (..))
-import SyntaxOp (subst, termSubst, termVars, (|=>))
+import Syntax.Instantiation ((|=>))
+import Syntax.Substitution (subst, termSubst)
+import Syntax.Vars (termVars)
 import Test.Hspec (context, describe, hspec, it, pending, shouldBe)
 
 main :: IO ()

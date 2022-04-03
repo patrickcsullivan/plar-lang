@@ -1,9 +1,11 @@
-module EvaluateExample where
+module Evaluate.Example where
 
-import Data.Map.Strict (Map, (!))
 import qualified Data.Map.Strict as Map
 import Data.Maybe (fromJust)
-import Evaluate (Interpretation (..), Valuation (Valuation))
+import Evaluate.Interpretation (Interpretation (..))
+import qualified Evaluate.Interpretation as I
+import Evaluate.Valuation (Valuation (..), (|->))
+import qualified Evaluate.Valuation as V
 import Syntax (Formula (..), Rltn (..), Term (..))
 
 boolInterp :: Interpretation Bool

@@ -1,4 +1,7 @@
-module PrettyPrint (prettyPrint) where
+module PrettyPrint
+  ( prettyPrint,
+  )
+where
 
 import Syntax (Formula (..))
 

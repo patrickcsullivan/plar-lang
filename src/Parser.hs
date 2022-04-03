@@ -1,4 +1,8 @@
-module Parser.Parser (run, run') where
+module Parser
+  ( run,
+    run',
+  )
+where
 
 import Parser.Formula (formula)
 import Parser.Rltn (rltn)
