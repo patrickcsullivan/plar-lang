@@ -34,9 +34,9 @@ library
       Parser.Rltn
       Parser.Term
       PrettyPrint
-      Rewrite
       Syntax
       Syntax.Instantiation
+      Syntax.Rewrite
       Syntax.Substitution
       Syntax.Vars
   other-modules:
