@@ -15,7 +15,7 @@ import Syntax.Vars (freeVars, termVars, variant)
 -- formula. If a variable in the given formula is not in the instantiation then
 -- it is left unchanged. Bound varibles in the formula are renamed as needed to
 -- avoid clashing with variables in the substituted terms.
-subst :: Instantiation -> Formula Rltn -> Formula Rltn
+subst :: Instantiation -> Formula -> Formula
 subst inst frm =
   case frm of
     F -> F
@@ -48,13 +48,13 @@ substQ ::
   Instantiation ->
   -- | Function for recreating the quantified formula into which terms are
   -- substituted.
-  (String -> Formula Rltn -> Formula Rltn) ->
+  (String -> Formula -> Formula) ->
   -- | The variable binding of the quantified formula into which terms are
   -- substituted.
   String ->
   -- | The scope of the quantified formula into which terms are substituted.
-  Formula Rltn ->
-  Formula Rltn
+  Formula ->
+  Formula
 substQ inst mkQuant x p =
   let -- Is there a free var, y, in p such that when substitution is applied to
       -- y, x appears in the free variables of y's substitute?

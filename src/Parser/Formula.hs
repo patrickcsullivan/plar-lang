@@ -1,6 +1,7 @@
 module Parser.Formula (formula) where
 
 import Data.Maybe (fromMaybe)
+import Parser.Rltn (rltn)
 import Syntax (Formula (..), Rltn (..), Term (..))
 import Text.Parsec (char, many1, parserZero, try, (<|>))
 import qualified Text.Parsec.Expr as Ex
@@ -9,8 +10,8 @@ import Text.Parsec.String (Parser)
 import qualified Text.Parsec.Token as Tok
 import Text.ParserCombinators.Parsec.Token (GenTokenParser)
 
-formula :: Parser a -> Parser (Formula a)
-formula atomInner = Ex.buildExpressionParser formulaTable (formulaCase atomInner)
+formula :: Parser Formula
+formula = Ex.buildExpressionParser formulaTable formulaCase
 
 formulaTable =
   [ [Ex.Prefix (reservedOp "~" >> return Not)],
@@ -20,45 +21,45 @@ formulaTable =
     [Ex.Infix (reservedOp "<=>" >> return Iff) Ex.AssocRight]
   ]
 
-formulaCase :: Parser a -> Parser (Formula a)
-formulaCase atomInner =
+formulaCase :: Parser Formula
+formulaCase =
   try formulaTrue
     <|> try formulaFalse
-    <|> try (formulaForAll atomInner)
-    <|> try (formulaExists atomInner)
-    <|> formulaAtom atomInner
-    <|> parens (formula atomInner)
+    <|> try formulaForAll
+    <|> try formulaExists
+    <|> formulaAtom
+    <|> parens formula
 
-formulaAtom :: Parser a -> Parser (Formula a)
-formulaAtom atomInner = do
-  Atom <$> atomInner
+formulaAtom :: Parser Formula
+formulaAtom = do
+  Atom <$> rltn
 
-formulaTrue :: Parser (Formula a)
+formulaTrue :: Parser Formula
 formulaTrue = do
   reserved "True"
   return T
 
-formulaFalse :: Parser (Formula a)
+formulaFalse :: Parser Formula
 formulaFalse = do
   reserved "False"
   return F
 
-formulaForAll :: Parser a -> Parser (Formula a)
-formulaForAll atomInner = do
+formulaForAll :: Parser Formula
+formulaForAll = do
   reserved "forall"
   (v : vs) <- reverse <$> many1 identifier
   char '.'
   whiteSpace
-  scope <- formula atomInner
+  scope <- formula
   return $ foldl (flip ForAll) (ForAll v scope) vs
 
-formulaExists :: Parser a -> Parser (Formula a)
-formulaExists atomInner = do
+formulaExists :: Parser Formula
+formulaExists = do
   reserved "exists"
   (v : vs) <- reverse <$> many1 identifier
   char '.'
   whiteSpace
-  scope <- formula atomInner
+  scope <- formula
   return $ foldl (flip Exists) (Exists v scope) vs
 
 lexer :: Tok.TokenParser ()

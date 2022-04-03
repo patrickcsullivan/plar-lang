@@ -17,11 +17,11 @@ import Prelude hiding (Either (..))
 -- | Converts the formula to prenex normal form (PNF), where all quantifiers
 -- occor on the outside with a body (aka matrix) where only propositional
 -- connectives are used.
-pnf :: Formula Rltn -> Formula Rltn
+pnf :: Formula -> Formula
 pnf = prenex . nnf . simplify
 
 -- | Recursviely pulls all quantifiers out to the top of the formula.
-prenex :: Formula Rltn -> Formula Rltn
+prenex :: Formula -> Formula
 prenex frm =
   case frm of
     ForAll x p -> ForAll x (prenex p)
@@ -33,7 +33,7 @@ prenex frm =
 -- | If the given formula contains a connective at its top level then this
 -- function will pull the top-most series of consecutive quantifiers out of each
 -- side of the connective.
-pullQs :: Formula Rltn -> Formula Rltn
+pullQs :: Formula -> Formula
 pullQs frm =
   case frm of
     And (ForAll x p) (ForAll y q) -> pullQsFromConnective (LeftRight x y) frm ForAll And p q
@@ -58,19 +58,19 @@ pullQsFromConnective ::
   -- quantified side.
   AndOr String String ->
   -- | The connective formula from which to pull out quantifiers.
-  Formula Rltn ->
+  Formula ->
   -- | Function for creating the quantifier that is pulled out.
-  (String -> Formula Rltn -> Formula Rltn) ->
+  (String -> Formula -> Formula) ->
   -- | Function for creating the connective that is at the top level of the
   -- formula.
-  (Formula Rltn -> Formula Rltn -> Formula Rltn) ->
+  (Formula -> Formula -> Formula) ->
   -- | Formula from the left side of the connective, excluding the top-most
   -- quantifier if it was quantified.
-  Formula Rltn ->
+  Formula ->
   -- | Formula from the right side of the connective, excluding the top-most
   -- quantifier if it was quantified.
-  Formula Rltn ->
-  Formula Rltn
+  Formula ->
+  Formula
 pullQsFromConnective varBindings frm mkQ mkConnective p q =
   let z = variant (leftElseRight varBindings) (freeVars frm)
       p' = case leftToMaybe varBindings of
@@ -84,7 +84,7 @@ pullQsFromConnective varBindings frm mkQ mkConnective p q =
 -- | Puts the formula in negation normal form (NNF) by repeatedly appling the De
 -- Morgan laws, the law of double negation, and "infinite De Morgan laws" on
 -- quantifiers to push negations down to the atomic forumulas.
-nnf :: Formula Rltn -> Formula Rltn
+nnf :: Formula -> Formula
 nnf frm =
   case frm of
     And p q -> And (nnf p) (nnf q)
@@ -105,7 +105,7 @@ nnf frm =
 -- | Recursively simplifies the formula. Simplifies connectives with `True` and
 -- `False`. Removes double negation. Removes quantification if it is vacuous
 -- (ie: the quantified variable does not appear free in the context).
-simplify :: Formula Rltn -> Formula Rltn
+simplify :: Formula -> Formula
 simplify frm = case frm of
   Not p -> simplify1 $ Not (simplify1 p)
   And p q -> simplify1 $ And (simplify p) (simplify q)
@@ -122,7 +122,7 @@ inspect msg val = (Debug.trace $ msg ++ "\n" ++ show val) val
 -- with `True` and `False`. Removes double negation. Removes quantification if
 -- it is vacuous (ie: the quantified variable does not appear free in the
 -- context).
-simplify1 :: Formula Rltn -> Formula Rltn
+simplify1 :: Formula -> Formula
 simplify1 frm =
   case frm of
     Not F -> T

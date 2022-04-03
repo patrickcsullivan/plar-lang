@@ -26,7 +26,7 @@ termVal m val x = case x of
 -- Throws an error if the formula contains any variable names that are not
 -- defined in the valuation or any function or predicate (aka relation) names
 -- that are not defined in the interpretation
-holds :: Interpretation a -> Valuation a -> Formula Rltn -> Bool
+holds :: Interpretation a -> Valuation a -> Formula -> Bool
 holds m val fm =
   case fm of
     F -> False

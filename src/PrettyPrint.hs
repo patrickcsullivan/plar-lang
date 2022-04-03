@@ -7,10 +7,10 @@ import Syntax (Formula (..))
 
 type Precidence = Int
 
--- instance Show a => Show (Formula a) where
+-- instance Show Formula where
 --   show = prettyPrint 0
 
-prettyPrint :: Show a => Precidence -> Formula a -> String
+prettyPrint :: Precidence -> Formula -> String
 prettyPrint prc formula = case formula of
   F -> "False"
   T -> "True"
@@ -23,14 +23,14 @@ prettyPrint prc formula = case formula of
   And frm frm' -> prettyPrintInfix 5 "and" prc frm frm'
   Not frm -> prettyPrintPrefix 6 "~" prc frm
 
-prettyPrintInfix :: Show a => Precidence -> String -> Precidence -> Formula a -> Formula a -> String
+prettyPrintInfix :: Precidence -> String -> Precidence -> Formula -> Formula -> String
 prettyPrintInfix opPrc opStr prc frmLeft frmRight =
   let s = prettyPrint (opPrc + 1) frmLeft ++ " " ++ opStr ++ " " ++ prettyPrint opPrc frmRight
    in if prc > opPrc
         then "(" ++ s ++ ")"
         else s
 
-prettyPrintPrefix :: Show a => Precidence -> String -> Precidence -> Formula a -> String
+prettyPrintPrefix :: Precidence -> String -> Precidence -> Formula -> String
 prettyPrintPrefix opPrc opStr prc frm =
   let s = opStr ++ " " ++ prettyPrint opPrc frm
    in if prc > opPrc

@@ -18,7 +18,7 @@ termVars trm =
     Fn _ args -> Set.unions (termVars <$> args)
 
 -- | Returns the set of all domain variables in the formula.
-vars :: Formula Rltn -> Set String
+vars :: Formula -> Set String
 vars frm = case frm of
   F -> Set.empty
   T -> Set.empty
@@ -32,7 +32,7 @@ vars frm = case frm of
   Exists x p -> Set.insert x (vars p)
 
 -- | Returns the set of free domain variables in the formula.
-freeVars :: Formula Rltn -> Set String
+freeVars :: Formula -> Set String
 freeVars frm =
   case frm of
     F -> Set.empty

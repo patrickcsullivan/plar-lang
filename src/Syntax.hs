@@ -1,26 +1,26 @@
 module Syntax where
 
 -- | A propositional formula which is intended to be true or false.
-data Formula a
+data Formula
   = -- | False.
     F
   | -- | True.
     T
   | -- | An atomic formula that contains no propositional connectives.
-    Atom a
+    Atom Rltn
   | -- | Negation.
-    Not (Formula a)
+    Not Formula
   | -- | Conjunction.
-    And (Formula a) (Formula a)
+    And Formula Formula
   | -- | Disjunction.
-    Or (Formula a) (Formula a)
+    Or Formula Formula
   | -- | Implication.
-    Imp (Formula a) (Formula a)
-  | Iff (Formula a) (Formula a)
+    Imp Formula Formula
+  | Iff Formula Formula
   | -- | Univerally quantified propositional formula. Takes a variable binding and a scope.
-    ForAll String (Formula a)
+    ForAll String Formula
   | -- | Existentially quantified propositional formula. Takes a variable binding and a scope.
-    Exists String (Formula a)
+    Exists String Formula
   deriving (Eq, Ord, Show)
 
 -- | A named relation (aka predicate) which is intended to be true or false but
