@@ -37,7 +37,9 @@ library
       PrettyPrint
       Syntax
       Syntax.Instantiation
+      Syntax.Name
       Syntax.Rewrite
+      Syntax.Skolemize
       Syntax.Substitution
       Syntax.Vars
   other-modules:

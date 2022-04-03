@@ -10,17 +10,20 @@ import AndOr (AndOr (..), leftElseRight, leftToMaybe, rightToMaybe)
 import qualified Debug.Trace as Debug
 import Syntax (Formula (..), Rltn, Term (..))
 import Syntax.Instantiation ((|=>))
+import Syntax.Name (variant)
 import Syntax.Substitution (subst)
-import Syntax.Vars (freeVars, variant)
+import Syntax.Vars (freeVars)
 import Prelude hiding (Either (..))
 
 -- | Converts the formula to prenex normal form (PNF), where all quantifiers
 -- occor on the outside with a body (aka matrix) where only propositional
--- connectives are used.
+-- connectives are used. The resulting formula is logically equivalent to the
+-- input formula.
 pnf :: Formula -> Formula
 pnf = prenex . nnf . simplify
 
--- | Recursviely pulls all quantifiers out to the top of the formula.
+-- | Recursviely pulls all quantifiers out to the top of the formula. The
+-- resulting formula is logically equivalent to the input formula.
 prenex :: Formula -> Formula
 prenex frm =
   case frm of
@@ -83,7 +86,8 @@ pullQsFromConnective varBindings frm mkQ mkConnective p q =
 
 -- | Puts the formula in negation normal form (NNF) by repeatedly appling the De
 -- Morgan laws, the law of double negation, and "infinite De Morgan laws" on
--- quantifiers to push negations down to the atomic forumulas.
+-- quantifiers to push negations down to the atomic forumulas. The resulting
+-- formula is logically equivalent to the input formula.
 nnf :: Formula -> Formula
 nnf frm =
   case frm of
@@ -104,7 +108,8 @@ nnf frm =
 
 -- | Recursively simplifies the formula. Simplifies connectives with `True` and
 -- `False`. Removes double negation. Removes quantification if it is vacuous
--- (ie: the quantified variable does not appear free in the context).
+-- (ie: the quantified variable does not appear free in the context). The
+-- resulting formula is logically equivalent to the input formula.
 simplify :: Formula -> Formula
 simplify frm = case frm of
   Not p -> simplify1 $ Not (simplify1 p)
@@ -115,8 +120,6 @@ simplify frm = case frm of
   ForAll x p -> simplify1 $ ForAll x (simplify p)
   Exists x p -> simplify1 $ Exists x (simplify p)
   _ -> frm
-
-inspect msg val = (Debug.trace $ msg ++ "\n" ++ show val) val
 
 -- | Simplifies the formula at the top level of the AST. Simplifies connectives
 -- with `True` and `False`. Removes double negation. Removes quantification if

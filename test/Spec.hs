@@ -7,6 +7,7 @@ import Parser (parse, parse')
 import Syntax (Formula (..), Rltn (..), Term (..))
 import Syntax.Instantiation ((|=>))
 import Syntax.Rewrite (pnf, simplify)
+import Syntax.Skolemize (skolemize)
 import Syntax.Substitution (subst, termSubst)
 import Syntax.Vars (freeVars, termVars)
 import Test.Hspec (context, describe, hspec, it, pending, shouldBe)
@@ -20,6 +21,7 @@ main = hspec $ do
   simplifySpec
   freeVarsSpec
   pnfSpec
+  skolemizeSpec
 
 parserSpec =
   describe "Parser.parse" $ do
@@ -95,18 +97,54 @@ parserSpec =
                   )
               )
           )
+    it "parses complicated" $ do
+      parse "exists y. x < y ==> forall u. exists v. x * u < y * v"
+        `shouldBeRight` Exists
+          "y"
+          ( Imp
+              (Atom (Rltn "<" [Var "x", Var "y"]))
+              ( ForAll
+                  "u"
+                  ( Exists
+                      "v"
+                      ( Atom
+                          ( Rltn
+                              "<"
+                              [ Fn "*" [Var "x", Var "u"],
+                                Fn "*" [Var "y", Var "v"]
+                              ]
+                          )
+                      )
+                  )
+              )
+          )
 
 wrong =
   Or
-    ( And
-        (Not (Atom (Rltn "P" [Var "x"])))
-        (Not (Atom (Rltn "R" [Var "y"])))
+    ( Not
+        ( Atom
+            ( Rltn
+                "<"
+                [ Var "x",
+                  Fn "f_y" [Var "x"]
+                ]
+            )
+        )
     )
-    ( Or
-        (Atom (Rltn "Q" [Var "y"]))
-        ( And
-            (Not (Atom (Rltn "P" [Var "z"])))
-            (Not (Atom (Rltn "Q" [Var "z"])))
+    ( Atom
+        ( Rltn
+            "<"
+            [ Fn
+                "*"
+                [ Var "x",
+                  Var "u"
+                ],
+              Fn
+                "*"
+                [ Fn "f_y" [Var "x"],
+                  Fn "f_v" [Var "u", Var "x"]
+                ]
+            ]
         )
     )
 
@@ -175,6 +213,17 @@ pnfSpec =
       let frm = parse' "(forall x. P(x) or R(y)) ==> exists y z. Q(y) or ~(exists z. P(z) and Q(z))"
           exp = parse' "exists x. forall z. ~P(x) and ~R(y) or Q(x) or ~P(z) or ~Q(z)"
       pnf frm `shouldBe` exp
+
+skolemizeSpec =
+  describe "Syntax.Skolemize.skolemize" $ do
+    it "Skolemizes complicated formula" $ do
+      let frm = parse' "exists y. x < y ==> forall u. exists v. x * u < y * v"
+          exp = parse' "~(x < f_y(x)) or x * u < f_y(x) * f_v(u, x)"
+      skolemize frm `shouldBe` exp
+    it "Skolemizes complicated formula" $ do
+      let frm = parse' "forall x. P(x) ==> (exists y z. Q(y) or ~(exists z. P(z) and Q(z)))"
+          exp = parse' "~P(x) or Q(c_y()) or ~P(z) or ~Q(z)"
+      skolemize frm `shouldBe` exp
 
 -- rewriteSpec =
 --   describe "Rewrite" $ do

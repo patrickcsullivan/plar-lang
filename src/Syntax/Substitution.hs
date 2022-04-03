@@ -9,7 +9,8 @@ import qualified Data.Set as Set
 import Syntax (Formula (..), Rltn (..), Term (..))
 import Syntax.Instantiation (Instantiation, (|->))
 import qualified Syntax.Instantiation as I
-import Syntax.Vars (freeVars, termVars, variant)
+import Syntax.Name (variant)
+import Syntax.Vars (freeVars, termVars)
 
 -- | Substitutes terms from the instantiation for free variables in the given
 -- formula. If a variable in the given formula is not in the instantiation then
