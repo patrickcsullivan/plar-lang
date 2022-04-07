@@ -3,6 +3,7 @@ module Syntax.Skolemize (skolemize) where
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Syntax (Formula (..), Rltn (..), Term (..))
+import Syntax.Functions (functions)
 import Syntax.Instantiation ((|=>))
 import Syntax.Name (variant)
 import Syntax.Rewrite
@@ -35,7 +36,7 @@ specialize frm =
 -- is equisatisfiable with the input formula.
 aSkolemize :: Formula -> Formula
 aSkolemize frm =
-  let avoidNames = Set.map fst (frmFns frm)
+  let avoidNames = Set.map fst (functions frm)
       (frm', _) = skolemizeNnf (nnf $ simplify frm) avoidNames
    in frm'
 
@@ -68,32 +69,3 @@ skolemizeNnf2 mkConn p q avoidNames =
       -- function names introduced while skolemizing the left side.
       (q', avoidNames'') = skolemizeNnf q avoidNames'
    in (mkConn p' q', avoidNames'')
-
--- | Return the set of domain functions in the formula.
-frmFns :: Formula -> Set (FnName, FnArity)
-frmFns =
-  foldAtoms
-    ( \(Rltn _ args) fns ->
-        fns `Set.union` Set.unions (trmFns <$> args)
-    )
-    Set.empty
-
--- | Return the set of domain functions in the term.
-trmFns :: Term -> Set (FnName, FnArity)
-trmFns trm = case trm of
-  Var s -> Set.empty
-  Fn name args -> Set.unions $ Set.singleton (name, length args) : (trmFns <$> args)
-
--- | Fold the atoms in the formula.
-foldAtoms :: (Rltn -> b -> b) -> b -> Formula -> b
-foldAtoms f z frm = case frm of
-  F -> z
-  T -> z
-  Atom rltn -> f rltn z
-  Not p -> foldAtoms f z p
-  And p q -> foldAtoms f (foldAtoms f z p) q
-  Or p q -> foldAtoms f (foldAtoms f z p) q
-  Imp p q -> foldAtoms f (foldAtoms f z p) q
-  Iff p q -> foldAtoms f (foldAtoms f z p) q
-  ForAll x p -> foldAtoms f z p
-  Exists x p -> foldAtoms f z p

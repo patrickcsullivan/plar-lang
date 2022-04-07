@@ -28,6 +28,7 @@ library
       AndOr
       Evaluate
       Evaluate.Example
+      Evaluate.Herband
       Evaluate.Interpretation
       Evaluate.Valuation
       Parser
@@ -36,6 +37,7 @@ library
       Parser.Term
       PrettyPrint
       Syntax
+      Syntax.Functions
       Syntax.Instantiation
       Syntax.Name
       Syntax.Rewrite
