@@ -238,3 +238,65 @@ skolemizeSpec =
 x `shouldBeRight` y = x `shouldBe` Right y
 
 x `shouldBeLeft` y = x `shouldBe` Left y
+
+p =
+  Or
+    ( Not
+        ( Atom
+            ( Rltn
+                "<"
+                [ Var "x",
+                  Fn
+                    "f_y"
+                    [Var "x"]
+                ]
+            )
+        )
+    )
+    ( Atom
+        ( Rltn
+            "<"
+            [ Fn
+                "*"
+                [Var "x", Var "u"],
+              Fn
+                "*"
+                [ Fn
+                    "f_y"
+                    [Var "x"],
+                  Fn
+                    "f_v"
+                    [Var "u", Var "x"]
+                ]
+            ]
+        )
+    )
+
+q =
+  Or
+    ( Not
+        ( Atom
+            ( Rltn
+                "<"
+                [ Var "x",
+                  Fn
+                    "f_y"
+                    [Var "x"]
+                ]
+            )
+        )
+    )
+    ( Atom
+        ( Rltn
+            "<"
+            [ Fn "*" [Var "x", Var "u"],
+              Fn
+                "*"
+                [ Fn "f_y" [Var "x"],
+                  Fn
+                    "f_v"
+                    [Var "u", Var "x"]
+                ]
+            ]
+        )
+    )

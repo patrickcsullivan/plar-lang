@@ -41,3 +41,17 @@ data Term
   | -- | A function whose domain and range are in the "object" domain.
     Fn String [Term]
   deriving (Eq, Ord, Show)
+
+-- | Fold the atoms in the formula.
+foldAtoms :: (Rltn -> b -> b) -> b -> Formula -> b
+foldAtoms f z frm = case frm of
+  F -> z
+  T -> z
+  Atom rltn -> f rltn z
+  Not p -> foldAtoms f z p
+  And p q -> foldAtoms f (foldAtoms f z p) q
+  Or p q -> foldAtoms f (foldAtoms f z p) q
+  Imp p q -> foldAtoms f (foldAtoms f z p) q
+  Iff p q -> foldAtoms f (foldAtoms f z p) q
+  ForAll x p -> foldAtoms f z p
+  Exists x p -> foldAtoms f z p
