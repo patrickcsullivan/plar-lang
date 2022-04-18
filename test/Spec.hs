@@ -26,13 +26,15 @@ main = hspec $ do
 parserSpec =
   describe "Parser.parse" $ do
     -- Formula connectives
+    it "parses `not` connective" $ do
+      parse "~p" `shouldBeRight` Not (Atom (Rltn "p" []))
     it "parses `and` connective" $ do
       parse "x and y" `shouldBeRight` And (Atom (Rltn "x" [])) (Atom (Rltn "y" []))
     -- Quantified formulas
-    it "parses forall x" $ do
-      parse "forall x. x = y" `shouldBeRight` ForAll "x" (Atom (Rltn "=" [Var "x", Var "y"]))
+    it "parses forall X" $ do
+      parse "forall X. x = y" `shouldBeRight` ForAll "X" (Atom (Rltn "=" [Var "x", Var "y"]))
     it "parses exists x" $ do
-      parse "exists x. x = y" `shouldBeRight` Exists "x" (Atom (Rltn "=" [Var "x", Var "y"]))
+      parse "exists X. x = y" `shouldBeRight` Exists "X" (Atom (Rltn "=" [Var "x", Var "y"]))
     -- Predicates / relations
     it "parses names with prime symbol" $ do
       parse "c'" `shouldBeRight` Atom (Rltn "c'" [])
@@ -53,13 +55,13 @@ parserSpec =
       parse "f(x + y)" `shouldBeRight` Atom (Rltn "f" [Fn "+" [Var "x", Var "y"]])
     -- Complicated formulas
     it "parses complicated" $ do
-      parse "forall x y. exists z. x < z + z and f(y) < z"
+      parse "forall X Y. exists Z. x < z + z and f(y) < z"
         `shouldBeRight` ForAll
-          "x"
+          "X"
           ( ForAll
-              "y"
+              "Y"
               ( Exists
-                  "z"
+                  "Z"
                   ( And
                       (Atom (Rltn "<" [Var "x", Fn "+" [Var "z", Var "z"]]))
                       (Atom (Rltn "<" [Fn "f" [Var "y"], Var "z"]))
@@ -67,46 +69,46 @@ parserSpec =
               )
           )
     it "parses complicated" $ do
-      parse "exists x. (x = 0) or exists y. (y = 1)"
+      parse "exists X. (x = 0) or exists Y. (y = 1)"
         `shouldBeRight` Exists
-          "x"
+          "X"
           ( Or
               (Atom (Rltn "=" [Var "x", Var "0"]))
               ( Exists
-                  "y"
+                  "Y"
                   (Atom (Rltn "=" [Var "y", Var "1"]))
               )
           )
     it "parses complicated" $ do
-      parse "(forall x. P(x) or R(y)) ==> exists y z. Q(y) or ~(exists z. P(z) or Q(z))"
+      parse "(forall X. P(x) or R(y)) ==> exists Y Z. Q(y) or ~(exists Z. P(z) or Q(z))"
         `shouldBeRight` Imp
           ( ForAll
-              "x"
+              "X"
               ( Or
                   (Atom (Rltn "P" [Var "x"]))
                   (Atom (Rltn "R" [Var "y"]))
               )
           )
           ( Exists
-              "y"
+              "Y"
               ( Exists
-                  "z"
+                  "Z"
                   ( Or
                       (Atom (Rltn "Q" [Var "y"]))
-                      (Not (Exists "z" (Or (Atom (Rltn "P" [Var "z"])) (Atom (Rltn "Q" [Var "z"])))))
+                      (Not (Exists "Z" (Or (Atom (Rltn "P" [Var "z"])) (Atom (Rltn "Q" [Var "z"])))))
                   )
               )
           )
     it "parses complicated" $ do
-      parse "exists y. x < y ==> forall u. exists v. x * u < y * v"
+      parse "exists Y. x < y ==> forall U. exists V. x * u < y * v"
         `shouldBeRight` Exists
-          "y"
+          "Y"
           ( Imp
               (Atom (Rltn "<" [Var "x", Var "y"]))
               ( ForAll
-                  "u"
+                  "U"
                   ( Exists
-                      "v"
+                      "V"
                       ( Atom
                           ( Rltn
                               "<"
@@ -150,8 +152,8 @@ wrong =
 
 holdsSpec =
   describe "Evaluate.holds" $ do
-    context "formula: forall x. (x = 0) or (x = 1)" $ do
-      let frm = parse' "forall x. (x = 0) or (x = 1)"
+    context "formula: forall X. (x = 0) or (x = 1)" $ do
+      let frm = parse' "forall X. (x = 0) or (x = 1)"
       it "holds in Boolean interpretation and valuation" $ do
         holds boolInterp boolValuation frm `shouldBe` True
       it "holds in mod 2 interpretation and valuation" $ do
@@ -174,54 +176,54 @@ termSubstSpec =
 
 substSpec =
   describe "Syntax.Substitution.subst" $ do
-    context "formula: forall x. x = y" $ do
-      let frm = parse' "forall x. x = y"
+    context "formula: forall X. x = y" $ do
+      let frm = parse' "forall X. x = y"
       context "instantiation: y |-> x" $ do
         let inst = "y" |=> Var "x"
         it "renames x to x'" $ do
-          subst inst frm `shouldBe` parse' "forall x'. x' = x"
-    context "formula: forall x x'. x = y ==> x = x'" $ do
-      let frm = parse' "forall x x'. x = y ==> x = x'"
+          subst inst frm `shouldBe` parse' "forall X'. x' = x"
+    context "formula: forall X X'. x = y ==> x = x'" $ do
+      let frm = parse' "forall X X'. x = y ==> x = x'"
       context "instantiation: y |-> x" $ do
         let inst = "y" |=> Var "x"
         it "renames x to x' and x' to x''" $ do
-          subst inst frm `shouldBe` parse' "forall x' x''. x' = x ==> x' = x''"
+          subst inst frm `shouldBe` parse' "forall X' X''. x' = x ==> x' = x''"
 
 freeVarsSpec =
   describe "Syntax.Vars.freeVars" $ do
     it "returns all variables when not quantified" $ do
       freeVars (parse' "P(x, y, z)") `shouldBe` Set.fromList ["x", "y", "z"]
     it "returns only free variables when quantified" $ do
-      freeVars (parse' "forall x. P(x, y)") `shouldBe` Set.singleton "y"
+      freeVars (parse' "forall X. P(x, y)") `shouldBe` Set.singleton "y"
 
 simplifySpec =
   describe "Syntax.Rewrite.simplify" $ do
     it "removes quantifiers over unused variables" $ do
-      simplify (parse' "forall x. P(y)") `shouldBe` parse' "P(y)"
+      simplify (parse' "forall X. P(y)") `shouldBe` parse' "P(y)"
     it "removes quantifier over variable that's unused because it's shadowed" $ do
-      let frm = parse' "exists x y. P(x) or exists y. Q(y)"
-          exp = parse' "exists x. P(x) or exists y. Q(y)"
+      let frm = parse' "exists X Y. P(x) or exists Y. Q(y)"
+          exp = parse' "exists X. P(x) or exists Y. Q(y)"
       simplify frm `shouldBe` exp
     it "simplifies complicated formula" $ do
-      let frm = parse' "forall x y z. x or True ==> True and ~(~P(y))"
-          exp = parse' "forall y. P(y)"
+      let frm = parse' "forall X Y Z. x or True ==> True and ~(~P(y))"
+          exp = parse' "forall Y. P(y)"
       simplify frm `shouldBe` exp
 
 pnfSpec =
   describe "Syntax.Rewrite.pnf" $ do
     it "converts complicated formula into PNF" $ do
-      let frm = parse' "(forall x. P(x) or R(y)) ==> exists y z. Q(y) or ~(exists z. P(z) and Q(z))"
-          exp = parse' "exists x. forall z. ~P(x) and ~R(y) or Q(x) or ~P(z) or ~Q(z)"
+      let frm = parse' "(forall X. P(x) or R(y)) ==> exists Y Z. Q(y) or ~(exists Z. P(z) and Q(z))"
+          exp = parse' "exists X. forall Z. ~P(x) and ~R(y) or Q(x) or ~P(z) or ~Q(z)"
       pnf frm `shouldBe` exp
 
 skolemizeSpec =
   describe "Syntax.Skolemize.skolemize" $ do
     it "Skolemizes complicated formula" $ do
-      let frm = parse' "exists y. x < y ==> forall u. exists v. x * u < y * v"
+      let frm = parse' "exists Y. x < y ==> forall U. exists V. x * u < y * v"
           exp = parse' "~(x < f_y(x)) or x * u < f_y(x) * f_v(u, x)"
       skolemize frm `shouldBe` exp
     it "Skolemizes complicated formula" $ do
-      let frm = parse' "forall x. P(x) ==> (exists y z. Q(y) or ~(exists z. P(z) and Q(z)))"
+      let frm = parse' "forall X. P(x) ==> (exists Y Z. Q(y) or ~(exists Z. P(z) and Q(z)))"
           exp = parse' "~P(x) or Q(c_y()) or ~P(z) or ~Q(z)"
       skolemize frm `shouldBe` exp
 

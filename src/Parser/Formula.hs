@@ -3,7 +3,7 @@ module Parser.Formula (formula) where
 import Data.Maybe (fromMaybe)
 import Parser.Rltn (rltn)
 import Syntax (Formula (..), Rltn (..), Term (..))
-import Text.Parsec (char, many1, parserZero, try, (<|>))
+import Text.Parsec (alphaNum, char, many1, parserZero, try, upper, (<|>))
 import qualified Text.Parsec.Expr as Ex
 import Text.Parsec.Language (emptyDef)
 import Text.Parsec.String (Parser)
@@ -67,7 +67,11 @@ lexer = Tok.makeTokenParser style
   where
     style =
       emptyDef
-        { -- Customer symbols are not allowed at the formula level, so we use
+        { -- Identifiers at this level are only used for variables, and
+          -- variables are only allowed to start with upper case letters.
+          Tok.identStart = upper,
+          Tok.identLetter = alphaNum <|> char '_' <|> char '\'',
+          -- Customer symbols are not allowed at the formula level, so we use
           -- the default definitions.
           Tok.reservedOpNames = ["~", "and", "or", "==>", "<=>"],
           Tok.reservedNames = ["True", "False", "forall", "exists"]
