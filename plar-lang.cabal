@@ -4,11 +4,11 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           logic-lang
+name:           plar-lang
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/logic-lang#readme>
-homepage:       https://github.com/githubuser/logic-lang#readme
-bug-reports:    https://github.com/githubuser/logic-lang/issues
+description:    Please see the README on GitHub at <https://github.com/githubuser/plar-lang#readme>
+homepage:       https://github.com/githubuser/plar-lang#readme
+bug-reports:    https://github.com/githubuser/plar-lang/issues
 author:         Author name here
 maintainer:     example@example.com
 copyright:      2022 Author name here
@@ -21,7 +21,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/logic-lang
+  location: https://github.com/githubuser/plar-lang
 
 library
   exposed-modules:
@@ -46,7 +46,7 @@ library
       Syntax.Vars
       TruthTable
   other-modules:
-      Paths_logic_lang
+      Paths_plar_lang
   hs-source-dirs:
       src
   build-depends:
@@ -55,25 +55,25 @@ library
     , parsec
   default-language: Haskell2010
 
-executable logic-lang-exe
+executable plar-lang-exe
   main-is: Main.hs
   other-modules:
-      Paths_logic_lang
+      Paths_plar_lang
   hs-source-dirs:
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , containers
-    , logic-lang
     , parsec
+    , plar-lang
   default-language: Haskell2010
 
-test-suite logic-lang-test
+test-suite plar-lang-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_logic_lang
+      Paths_plar_lang
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -81,6 +81,6 @@ test-suite logic-lang-test
       base >=4.7 && <5
     , containers
     , hspec
-    , logic-lang
     , parsec
+    , plar-lang
   default-language: Haskell2010
